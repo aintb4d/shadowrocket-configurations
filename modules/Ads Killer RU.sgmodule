@@ -1,5 +1,5 @@
 #!name=Ads Killer RU
-#!desc=v1.0 @aintb4d
+#!desc=v1.0
 
 DOMAIN-SET,https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Shadowrocket/Advertising/Advertising_Domain.list,REJECT-DROP
 RULE-SET,https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Shadowrocket/Advertising/Advertising.list,REJECT-DROP
