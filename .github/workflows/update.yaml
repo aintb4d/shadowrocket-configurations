@@ -50,6 +50,14 @@ jobs:
           process_src "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Shadowrocket/Instagram/Instagram.list"
         ) | sort -u > rules/smart/WARP.list
 
+        echo "Processing NoResolve category..."
+        (
+          process_src "https://github.com/toneywhitez/zkeen_rules/releases/latest/download/discord_ips.list"
+          process_src "https://github.com/toneywhitez/zkeen_rules/releases/latest/download/cloudflare_ips.list"
+          process_src "https://github.com/toneywhitez/zkeen_rules/releases/latest/download/meta_ips.list"
+          process_src "https://raw.githubusercontent.com/HybridNetworks/whatsapp-cidr/refs/heads/main/WhatsApp/whatsapp_cidr_ipv4.list"
+        ) | sort -u > rules/smart/NoResolve.list
+
     - name: Commit and Push Changes
       run: |
         git config --global user.name "github-actions[bot]"
