@@ -1,10 +1,12 @@
 DOMAIN,www.googleapis.com
 DOMAIN-KEYWORD,1drv
+DOMAIN-KEYWORD,instagram
 DOMAIN-KEYWORD,onedrive
 DOMAIN-KEYWORD,skydrive
 DOMAIN-KEYWORD,ttvnw
 DOMAIN-KEYWORD,youtube
 DOMAIN-SUFFIX,1drv.com
+DOMAIN-SUFFIX,cdninstagram.com
 DOMAIN-SUFFIX,docs.google.com
 DOMAIN-SUFFIX,drive.google.com
 DOMAIN-SUFFIX,ext-twitch.tv
@@ -15,6 +17,8 @@ DOMAIN-SUFFIX,googleusercontent.com
 DOMAIN-SUFFIX,googlevideo.com
 DOMAIN-SUFFIX,gvt1.com
 DOMAIN-SUFFIX,gvt2.com
+DOMAIN-SUFFIX,instagr.am
+DOMAIN-SUFFIX,instagram.com
 DOMAIN-SUFFIX,jtvnw.net
 DOMAIN-SUFFIX,live-video.net
 DOMAIN-SUFFIX,livefilestore.com

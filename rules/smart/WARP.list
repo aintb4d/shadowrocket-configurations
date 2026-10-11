@@ -1,5 +1,6 @@
 DOMAIN,www.googleapis.com
 DOMAIN-KEYWORD,1drv
+DOMAIN-KEYWORD,instagram
 DOMAIN-KEYWORD,onedrive
 DOMAIN-KEYWORD,skydrive
 DOMAIN-KEYWORD,steambroadcast
@@ -15,6 +16,7 @@ DOMAIN-SUFFIX,bigbeans.solutions
 DOMAIN-SUFFIX,cdn-ali.content.steamchina.com
 DOMAIN-SUFFIX,cdn-qc.content.steamchina.com
 DOMAIN-SUFFIX,cdn-ws.content.steamchina.com
+DOMAIN-SUFFIX,cdninstagram.com
 DOMAIN-SUFFIX,csgo.wmsj.cn
 DOMAIN-SUFFIX,dis.gd
 DOMAIN-SUFFIX,discord-activities.com
@@ -65,6 +67,8 @@ DOMAIN-SUFFIX,gvt2.com
 DOMAIN-SUFFIX,hammerandchisel.ssl.zendesk.com
 DOMAIN-SUFFIX,helpshift.com
 DOMAIN-SUFFIX,humblebundle.com
+DOMAIN-SUFFIX,instagr.am
+DOMAIN-SUFFIX,instagram.com
 DOMAIN-SUFFIX,jtvnw.net
 DOMAIN-SUFFIX,live-video.net
 DOMAIN-SUFFIX,livefilestore.com
