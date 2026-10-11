@@ -6,7 +6,7 @@
 
 [ru_whitelist.conf](./conf/ru_whitelist.conf) – белый список напрямую, всё остальное в прокси.
 
-#####NEW!
+##### NEW!
 [ru_smart.conf](./conf/ru_smart.conf) – аналогично `ru.conf`, но добавлено разделение трафика между WARP и Европейскими серверами вашего VPN, для настройки используйте `[Proxy Group]` в конфиге.
 
 ### Прочие файлы репозитория
@@ -29,7 +29,7 @@
 
 [ru_whitelist.conf](./conf/ru_whitelist.conf) – the whitelist connects directly, while everything else goes through the proxy.
 
-#####NEW!
+##### NEW!
 [ru_smart.conf](./conf/ru_smart.conf) – similar to `ru.conf`, but with traffic splitting between WARP and your VPN's European servers. Use `[Proxy Group]` in the config to configure it.
 
 ### Other repository files
