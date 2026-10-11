@@ -6,6 +6,9 @@
 
 [ru_whitelist.conf](./conf/ru_whitelist.conf) – белый список напрямую, всё остальное в прокси.
 
+#####NEW!
+[ru_smart.conf](./conf/ru_smart.conf) – аналогично `ru.conf`, но добавлено разделение трафика между WARP и Европейскими серверами вашего VPN, для настройки используйте `[Proxy Group]` в конфиге.
+
 ### Прочие файлы репозитория
 
 [direct.list](./rules/direct.list) – отдельный список доменов напрямую (для `ru.conf`);
@@ -25,6 +28,9 @@
 [ru_direct.conf](./conf/ru_direct.conf) – everything connects directly, with a separate list of blocked domains going through the proxy;
 
 [ru_whitelist.conf](./conf/ru_whitelist.conf) – the whitelist connects directly, while everything else goes through the proxy.
+
+#####NEW!
+[ru_smart.conf](./conf/ru_smart.conf) – similar to `ru.conf`, but with traffic splitting between WARP and your VPN's European servers. Use `[Proxy Group]` in the config to configure it.
 
 ### Other repository files
 
