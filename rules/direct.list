@@ -54,6 +54,13 @@ DOMAIN-KEYWORD,steambroadcast
 DOMAIN-KEYWORD,steamstore
 DOMAIN-KEYWORD,steamuserimages
 
+# Spotify
+DOMAIN-SUFFIX,scdn.co
+DOMAIN-SUFFIX,pscdn.co
+DOMAIN-SUFFIX,spotifycdn.com
+DOMAIN-SUFFIX,audio-ak-spotify-com.akamaized.net
+DOMAIN-SUFFIX,heads-ak-spotify-com.akamaized.net
+
 # Reddit
 DOMAIN-SUFFIX,redd.it
 DOMAIN-SUFFIX,reddit.com
