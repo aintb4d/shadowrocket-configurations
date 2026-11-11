@@ -5,6 +5,9 @@ on:
     - cron: '0 3 * * *'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build-lists:
     runs-on: ubuntu-latest
@@ -14,42 +17,109 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Process and Merge Rule Lists
+      shell: bash
       run: |
-        mkdir -p rules
-        process_src() {
-          curl -sLf "$1" | grep -v '^[[:space:]]*#' | grep -v '^[[:space:]]*$' || true
+        set -uo pipefail
+        OUT=rules/smart
+        mkdir -p "$OUT"
+
+        # Download one source, strip comments, blank lines and CR
+        fetch_src() {
+          local tmp
+          tmp=$(mktemp)
+          if ! curl -sLf --retry 3 --retry-delay 5 "$1" -o "$tmp"; then
+            echo "::warning::Failed to download $1" >&2
+            rm -f "$tmp"
+            return 1
+          fi
+          tr -d '\r' < "$tmp" | grep -Ev '^[[:space:]]*(#|$)' || true
+          rm -f "$tmp"
         }
 
-        echo "Processing WARP category..."
-        (
-          process_src "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Shadowrocket/YouTube/YouTube.list"
-          process_src "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Shadowrocket/Twitch/Twitch.list"
-          process_src "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Shadowrocket/Pinterest/Pinterest.list"
-          process_src "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Shadowrocket/GoogleDrive/GoogleDrive.list"
-          process_src "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Shadowrocket/OneDrive/OneDrive.list"
-          process_src "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Shadowrocket/Steam/Steam.list"
-          process_src "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Shadowrocket/Epic/Epic.list"
-          process_src "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Shadowrocket/Discord/Discord.list"
-          process_src "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Shadowrocket/Instagram/Instagram.list"
-          process_src "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Shadowrocket/Twitter/Twitter.list"
-          process_src "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Shadowrocket/Reddit/Reddit.list"
-          process_src "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Shadowrocket/GitHub/GitHub.list"
-        ) | sort -u > rules/smart/WARP.list
+        # build_list <output file> <source url>...
+        # Merges and dedups sources; keeps the previous file if a download fails or the result is empty
+        build_list() {
+          local out="$1" tmp
+          shift
+          tmp=$(mktemp)
+          for url in "$@"; do
+            if ! fetch_src "$url" >> "$tmp"; then
+              echo "::warning::Keeping previous $out"
+              rm -f "$tmp"
+              return 0
+            fi
+          done
+          sort -u "$tmp" -o "$tmp"
+          if [ -n "${EXCLUDE:-}" ]; then
+            grep -vxF "$EXCLUDE" "$tmp" > "$tmp.f" || true
+            mv "$tmp.f" "$tmp"
+          fi
+          if [ -s "$tmp" ]; then
+            mv "$tmp" "$out"
+            echo "Built $out ($(wc -l < "$out") lines)"
+          else
+            echo "::warning::Result for $out is empty, keeping previous"
+            rm -f "$tmp"
+          fi
+        }
 
-        echo "Processing NoResolve category..."
-        (
-          process_src "https://github.com/toneywhitez/zkeen_rules/releases/latest/download/discord_ips.list"
-          process_src "https://github.com/toneywhitez/zkeen_rules/releases/latest/download/meta_ips.list"
-          process_src "https://raw.githubusercontent.com/HybridNetworks/whatsapp-cidr/refs/heads/main/WhatsApp/whatsapp_cidr_ipv4.list"
-        ) | sort -u | grep -vxF 'IP-CIDR,104.16.0.0/13' > rules/smart/NoResolve.list
+        BM7=https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Shadowrocket
+        YOBA=https://raw.githubusercontent.com/Master-Yoba/shadowrocket-rules/release
+        REFILTER=https://raw.githubusercontent.com/1andrevich/Re-filter-lists/main
+
+        echo "Processing WARP category..."
+        build_list "$OUT/warp.list" \
+          "$BM7/YouTube/YouTube.list" \
+          "$BM7/Twitch/Twitch.list" \
+          "$BM7/Pinterest/Pinterest.list" \
+          "$BM7/GoogleDrive/GoogleDrive.list" \
+          "$BM7/OneDrive/OneDrive.list" \
+          "$BM7/Steam/Steam.list" \
+          "$BM7/Epic/Epic.list" \
+          "$BM7/Discord/Discord.list" \
+          "$BM7/Instagram/Instagram.list" \
+          "$BM7/Twitter/Twitter.list" \
+          "$BM7/Reddit/Reddit.list" \
+          "$BM7/GitHub/GitHub.list"
+
+        echo "Processing WARP IP category..."
+        EXCLUDE='IP-CIDR,104.16.0.0/13' build_list "$OUT/warp-ip.list" \
+          "https://github.com/toneywhitez/zkeen_rules/releases/latest/download/discord_ips.list" \
+          "https://github.com/toneywhitez/zkeen_rules/releases/latest/download/meta_ips.list" \
+          "https://raw.githubusercontent.com/HybridNetworks/whatsapp-cidr/refs/heads/main/WhatsApp/whatsapp_cidr_ipv4.list"
+
+        echo "Processing govblocked..."
+        build_list "$OUT/govblocked.list" \
+          "$YOBA/rules-geosite/geosite-ru-blocked.list"
+
+        build_list "$OUT/govblocked-ip.list" \
+          "$YOBA/rules-geoip/geoip-ru-blocked.list" \
+          "$YOBA/rules-geoip/geoip-ru-blocked-community.list"
+
+        echo "Processing geoblocked..."
+        build_list "$OUT/geoblocked-domains.list" \
+          "$REFILTER/community.lst"
+
+        build_list "$OUT/geoblocked.list" \
+          "https://raw.githubusercontent.com/haritos90/allow-domains/main/Categories/15-ru-ip-blocked-surge.list"
+
+        build_list "$OUT/geoblocked-ip.list" \
+          "$REFILTER/community_ips.lst"
+
+        echo "Processing Russian category..."
+        build_list "$OUT/category-ru.list" \
+          "$YOBA/rules-geosite/geosite-category-ru.list"
 
     - name: Commit and Push Changes
       run: |
         git config --global user.name "github-actions[bot]"
         git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-        
+
+        # Remove old file names after the rename
+        git rm -f --ignore-unmatch rules/smart/WARP.list rules/smart/NoResolve.list
+
         git add rules/
-        
+
         if git diff --cached --quiet; then
           echo "No changes found. Everything is up to date."
         else
