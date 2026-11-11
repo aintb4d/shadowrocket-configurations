@@ -1,3 +1,4 @@
+
 name: Update lists
 
 on:
@@ -13,116 +14,148 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-        - name: Process and Merge Rule Lists
-      shell: bash
-      run: |
-        set -uo pipefail
-        OUT=rules/smart
-        mkdir -p "$OUT"
+      - name: Process and Merge Rule Lists
+        shell: bash
+        run: |
+          set -uo pipefail
 
-        # Download one source, strip comments, blank lines and CR
-        fetch_src() {
-          local tmp
-          tmp=$(mktemp)
-          if ! curl -sLf --retry 3 --retry-delay 5 "$1" -o "$tmp"; then
-            echo "::warning::Failed to download $1" >&2
-            rm -f "$tmp"
-            return 1
-          fi
-          tr -d '\r' < "$tmp" | grep -Ev '^[[:space:]]*(#|$)' || true
-          rm -f "$tmp"
-        }
+          OUT=rules/smart
+          mkdir -p "$OUT"
 
-        # Bare-domain list (one domain per line) -> DOMAIN-SUFFIX rules
-        fetch_domains() {
-          fetch_src "$1" | sed -E 's/^\.//' | awk 'NF && $0 !~ /,/ {print "DOMAIN-SUFFIX," $0}'
-        }
+          # Download one source, strip comments, blank lines and CR
+          fetch_src() {
+            local tmp
+            tmp=$(mktemp)
 
-        # build_list <output file> <source>...
-        # A source prefixed with "domains:" is a bare-domain list.
-        # Keeps the previous file if a download fails or the result is empty.
-        build_list() {
-          local out="$1" tmp
-          shift
-          tmp=$(mktemp)
-          for src in "$@"; do
-            case "$src" in
-              domains:*) fetch_domains "${src#domains:}" >> "$tmp" ;;
-              *)         fetch_src "$src" >> "$tmp" ;;
-            esac
-            if [ "$?" -ne 0 ]; then
-              echo "::warning::Keeping previous $out"
+            if ! curl -sLf --retry 3 --retry-delay 5 "$1" -o "$tmp"; then
+              echo "::warning::Failed to download $1" >&2
               rm -f "$tmp"
-              return 0
+              return 1
             fi
-          done
-          sort -u "$tmp" -o "$tmp"
-          if [ -n "${EXCLUDE:-}" ]; then
-            grep -vxF "$EXCLUDE" "$tmp" > "$tmp.f" || true
-            mv "$tmp.f" "$tmp"
-          fi
-          # Add no-resolve to every IP-based rule that does not have it yet
-          sed -E '/^(IP-CIDR6?|IP-ASN),/{/no-resolve/!s/$/,no-resolve/}' "$tmp" | sort -u > "$tmp.n"
-          mv "$tmp.n" "$tmp"
-          if [ -s "$tmp" ]; then
-            mv "$tmp" "$out"
-            echo "Built $out ($(wc -l < "$out") lines)"
-          else
-            echo "::warning::Result for $out is empty, keeping previous"
+
+            tr -d '\r' < "$tmp" | grep -Ev '^[[:space:]]*(#|$)' || true
             rm -f "$tmp"
+          }
+
+          # Bare-domain list -> DOMAIN-SUFFIX rules
+          fetch_domains() {
+            fetch_src "$1" |
+              sed -E 's/^\.//' |
+              awk 'NF && $0 !~ /,/ {print "DOMAIN-SUFFIX," $0}'
+          }
+
+          # Build merged list
+          build_list() {
+            local out="$1"
+            local tmp
+            shift
+
+            tmp=$(mktemp)
+
+            for src in "$@"; do
+              case "$src" in
+                domains:*)
+                  fetch_domains "${src#domains:}" >> "$tmp"
+                  ;;
+                *)
+                  fetch_src "$src" >> "$tmp"
+                  ;;
+              esac
+
+              if [ "$?" -ne 0 ]; then
+                echo "::warning::Keeping previous $out"
+                rm -f "$tmp"
+                return 0
+              fi
+            done
+
+            sort -u "$tmp" -o "$tmp"
+
+            if [ -n "${EXCLUDE:-}" ]; then
+              grep -vxF "$EXCLUDE" "$tmp" > "$tmp.f" || true
+              mv "$tmp.f" "$tmp"
+            fi
+
+            # Add no-resolve to IP-based rules
+            sed -E '/^(IP-CIDR6?|IP-ASN),/{/no-resolve/!s/$/,no-resolve/}' "$tmp" |
+              sort -u > "$tmp.n"
+
+            mv "$tmp.n" "$tmp"
+
+            if [ -s "$tmp" ]; then
+              mv "$tmp" "$out"
+              echo "Built $out ($(wc -l < "$out") lines)"
+            else
+              echo "::warning::Result for $out is empty, keeping previous"
+              rm -f "$tmp"
+            fi
+          }
+
+          BM7=https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Shadowrocket
+          YOBA=https://raw.githubusercontent.com/Master-Yoba/shadowrocket-rules/release
+          REFILTER=https://raw.githubusercontent.com/1andrevich/Re-filter-lists/main
+
+          echo "Processing WARP list (domains + IPs)..."
+
+          EXCLUDE='IP-CIDR,104.16.0.0/13' build_list "$OUT/warp.list" \
+            "$BM7/YouTube/YouTube.list" \
+            "$BM7/Twitch/Twitch.list" \
+            "$BM7/Pinterest/Pinterest.list" \
+            "$BM7/GoogleDrive/GoogleDrive.list" \
+            "$BM7/OneDrive/OneDrive.list" \
+            "$BM7/Steam/Steam.list" \
+            "$BM7/Epic/Epic.list" \
+            "$BM7/Discord/Discord.list" \
+            "$BM7/Instagram/Instagram.list" \
+            "$BM7/Twitter/Twitter.list" \
+            "$BM7/Reddit/Reddit.list" \
+            "$BM7/GitHub/GitHub.list" \
+            "https://github.com/toneywhitez/zkeen_rules/releases/latest/download/discord_ips.list" \
+            "https://github.com/toneywhitez/zkeen_rules/releases/latest/download/meta_ips.list" \
+            "https://raw.githubusercontent.com/HybridNetworks/whatsapp-cidr/refs/heads/main/WhatsApp/whatsapp_cidr_ipv4.list"
+
+          echo "Processing blocked list (gov + geo, domains + IPs)..."
+
+          build_list "$OUT/blocked.list" \
+            "$YOBA/rules-geosite/geosite-ru-blocked.list" \
+            "$YOBA/rules-geoip/geoip-ru-blocked.list" \
+            "$YOBA/rules-geoip/geoip-ru-blocked-community.list" \
+            "domains:$REFILTER/community.lst" \
+            "https://raw.githubusercontent.com/haritos90/allow-domains/main/Categories/15-ru-ip-blocked-surge.list" \
+            "$REFILTER/community_ips.list"
+
+          # Remove rules already present in warp.list
+          if [ -s "$OUT/warp.list" ] && [ -s "$OUT/blocked.list" ]; then
+            tmp=$(mktemp)
+
+            if grep -vxFf "$OUT/warp.list" "$OUT/blocked.list" > "$tmp"; then
+              mv "$tmp" "$OUT/blocked.list"
+            else
+              status=$?
+
+              if [ "$status" -eq 1 ]; then
+                mv "$tmp" "$OUT/blocked.list"
+              else
+                echo "::warning::Failed to filter blocked.list"
+                rm -f "$tmp"
+              fi
+            fi
           fi
-        }
 
-        BM7=https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Shadowrocket
-        YOBA=https://raw.githubusercontent.com/Master-Yoba/shadowrocket-rules/release
-        REFILTER=https://raw.githubusercontent.com/1andrevich/Re-filter-lists/main
+      - name: Commit and Push Changes
+        shell: bash
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-        echo "Processing WARP list (domains + IPs)..."
-        EXCLUDE='IP-CIDR,104.16.0.0/13' build_list "$OUT/warp.list" \
-          "$BM7/YouTube/YouTube.list" \
-          "$BM7/Twitch/Twitch.list" \
-          "$BM7/Pinterest/Pinterest.list" \
-          "$BM7/GoogleDrive/GoogleDrive.list" \
-          "$BM7/OneDrive/OneDrive.list" \
-          "$BM7/Steam/Steam.list" \
-          "$BM7/Epic/Epic.list" \
-          "$BM7/Discord/Discord.list" \
-          "$BM7/Instagram/Instagram.list" \
-          "$BM7/Twitter/Twitter.list" \
-          "$BM7/Reddit/Reddit.list" \
-          "$BM7/GitHub/GitHub.list" \
-          "https://github.com/toneywhitez/zkeen_rules/releases/latest/download/discord_ips.list" \
-          "https://github.com/toneywhitez/zkeen_rules/releases/latest/download/meta_ips.list" \
-          "https://raw.githubusercontent.com/HybridNetworks/whatsapp-cidr/refs/heads/main/WhatsApp/whatsapp_cidr_ipv4.list"
+          git add rules/
 
-        echo "Processing blocked list (gov + geo, domains + IPs)..."
-        build_list "$OUT/blocked.list" \
-          "$YOBA/rules-geosite/geosite-ru-blocked.list" \
-          "$YOBA/rules-geoip/geoip-ru-blocked.list" \
-          "$YOBA/rules-geoip/geoip-ru-blocked-community.list" \
-          "domains:$REFILTER/community.lst" \
-          "https://raw.githubusercontent.com/haritos90/allow-domains/main/Categories/15-ru-ip-blocked-surge.list" \
-          "$REFILTER/community_ips.lst"
-
-        # Lines already in warp.list must not appear in blocked.list
-        if [ -s "$OUT/warp.list" ] && [ -s "$OUT/blocked.list" ]; then
-          grep -vxFf "$OUT/warp.list" "$OUT/blocked.list" > "$OUT/blocked.tmp" || true
-          [ -s "$OUT/blocked.tmp" ] && mv "$OUT/blocked.tmp" "$OUT/blocked.list" || rm -f "$OUT/blocked.tmp"
-        fi
-
-    - name: Commit and Push Changes
-      run: |
-        git config --global user.name "github-actions[bot]"
-        git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-        git add rules/
-
-        if git diff --cached --quiet; then
-          echo "No changes found. Everything is up to date."
-        else
-          git commit -m "Automated update"
-          git push
-        fi
+          if git diff --cached --quiet; then
+            echo "No changes found. Everything is up to date."
+          else
+            git commit -m "Automated update"
+            git push
+          fi
