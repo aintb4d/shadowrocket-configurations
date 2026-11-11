@@ -124,7 +124,7 @@ jobs:
             "$YOBA/rules-geoip/geoip-ru-blocked-community.list" \
             "domains:$REFILTER/community.lst" \
             "https://raw.githubusercontent.com/haritos90/allow-domains/main/Categories/15-ru-ip-blocked-surge.list" \
-            "$REFILTER/community_ips.list"
+            "$REFILTER/community_ips.lst"
 
           # Remove rules already present in warp.list
           if [ -s "$OUT/warp.list" ] && [ -s "$OUT/blocked.list" ]; then
