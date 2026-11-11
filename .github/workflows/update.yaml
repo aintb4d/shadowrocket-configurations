@@ -100,7 +100,6 @@ jobs:
           echo "Processing WARP list (domains + IPs)..."
 
           EXCLUDE='IP-CIDR,104.16.0.0/13' build_list "$OUT/warp.list" \
-            "$BM7/YouTube/YouTube.list" \
             "$BM7/Twitch/Twitch.list" \
             "$BM7/Pinterest/Pinterest.list" \
             "$BM7/GoogleDrive/GoogleDrive.list" \
