@@ -22270,6 +22270,7 @@ DOMAIN-SUFFIX,gglocate.com
 DOMAIN-SUFFIX,ggod.pro
 DOMAIN-SUFFIX,ggokpkr11.ru
 DOMAIN-SUFFIX,ggpartners.com
+DOMAIN-SUFFIX,ggpht.com
 DOMAIN-SUFFIX,ggpk.ru
 DOMAIN-SUFFIX,ggrowerz.cyou
 DOMAIN-SUFFIX,ggrrandprogram.shop
@@ -23154,6 +23155,7 @@ DOMAIN-SUFFIX,googleadservices.com
 DOMAIN-SUFFIX,googledino.ru
 DOMAIN-SUFFIX,googlestatic.servehttp.com
 DOMAIN-SUFFIX,googletagmanager.com
+DOMAIN-SUFFIX,googlevideo.com
 DOMAIN-SUFFIX,googoobutt.com
 DOMAIN-SUFFIX,goojara.to
 DOMAIN-SUFFIX,gool-live.at.ua
@@ -24017,6 +24019,8 @@ DOMAIN-SUFFIX,gvashev.ru
 DOMAIN-SUFFIX,gvdblog.cc
 DOMAIN-SUFFIX,gvidi.ru
 DOMAIN-SUFFIX,gvk24.ru
+DOMAIN-SUFFIX,gvt1.com
+DOMAIN-SUFFIX,gvt2.com
 DOMAIN-SUFFIX,gw.ashoo.fun
 DOMAIN-SUFFIX,gwaramedia.com
 DOMAIN-SUFFIX,gx.ashoo.blue
@@ -64774,6 +64778,7 @@ DOMAIN-SUFFIX,wickedfire.com
 DOMAIN-SUFFIX,wickedpictures.info
 DOMAIN-SUFFIX,wickr.com
 DOMAIN-SUFFIX,wid.org.pl
+DOMAIN-SUFFIX,wide-youtube.l.google.com
 DOMAIN-SUFFIX,widebud.com
 DOMAIN-SUFFIX,widebush.com
 DOMAIN-SUFFIX,widefoldy.com
@@ -73051,8 +73056,16 @@ DOMAIN-SUFFIX,youthassembly.org
 DOMAIN-SUFFIX,youthbusiness.ru
 DOMAIN-SUFFIX,youtor.org
 DOMAIN-SUFFIX,youtrack.cloud
+DOMAIN-SUFFIX,youtu.be
 DOMAIN-SUFFIX,youtube---radar.ru
 DOMAIN-SUFFIX,youtube-monitor.ru
+DOMAIN-SUFFIX,youtube-nocookie.com
+DOMAIN-SUFFIX,youtube-ui.l.google.com
+DOMAIN-SUFFIX,youtube.com
+DOMAIN-SUFFIX,youtube.googleapis.com
+DOMAIN-SUFFIX,youtubeembeddedplayer.googleapis.com
+DOMAIN-SUFFIX,youtubei.googleapis.com
+DOMAIN-SUFFIX,youtubekids.com
 DOMAIN-SUFFIX,youtuber-vpn.com
 DOMAIN-SUFFIX,youtubevpn.top
 DOMAIN-SUFFIX,youtubu.tv
@@ -73073,9 +73086,11 @@ DOMAIN-SUFFIX,ysaa.ru
 DOMAIN-SUFFIX,ysr.top-sofosbuvir1.ru
 DOMAIN-SUFFIX,ystrebytel-demonov-animego.ru
 DOMAIN-SUFFIX,yt-video-upload.l.google.com
+DOMAIN-SUFFIX,yt.be
 DOMAIN-SUFFIX,yt3.ggpht.com
 DOMAIN-SUFFIX,yt3.googleusercontent.com
 DOMAIN-SUFFIX,ytbypass.com
+DOMAIN-SUFFIX,ytimg.com
 DOMAIN-SUFFIX,ytm.al
 DOMAIN-SUFFIX,yto.to
 DOMAIN-SUFFIX,yts.lt
