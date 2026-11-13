@@ -2,9 +2,9 @@
 
 [direct.conf](./conf/direct.conf) – всё напрямую, отдельный список заблокированного в прокси;
 
-[proxy.conf](./conf/ru.conf) – всё в прокси, российские сервисы, Apple и некоторые сервисы напрямую;
+[proxy.conf](./conf/proxy.conf) – всё в прокси, российские сервисы, Apple и некоторые сервисы напрямую;
 
-[whitelist.conf](./conf/ru_whitelist.conf) – белый список напрямую, всё остальное в прокси.
+[whitelist.conf](./conf/whitelist.conf) – белый список напрямую, всё остальное в прокси.
 
 ---
 
@@ -12,6 +12,6 @@
 
 [direct.conf](./conf/direct.conf) – everything connects directly, with a separate list of blocked domains going through the proxy;
 
-[proxy.conf](./conf/ru.conf) – everything goes through the proxy, while Russian services, Apple, and some other services connect directly;
+[proxy.conf](./conf/proxy.conf) – everything goes through the proxy, while Russian services, Apple, and some other services connect directly;
 
-[whitelist.conf](./conf/ru_whitelist.conf) – the whitelist connects directly, while everything else goes through the proxy.
+[whitelist.conf](./conf/whitelist.conf) – the whitelist connects directly, while everything else goes through the proxy.
